@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 Leo Natan. All rights reserved.
 //
 
-@import UIKit;
-@import Foundation;
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 @class LNNotification, LNNotificationAppSettings;
 
