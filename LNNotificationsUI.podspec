@@ -1,7 +1,10 @@
+<<<<<<< ours
 #
 #  Be sure to run `pod spec lint LNNotificationsUI.podspec' to ensure this is a
 #  valid spec and to remove all comments including this before submitting the spec.
 
+=======
+>>>>>>> theirs
 Pod::Spec.new do |s|
 
   s.name         = "LNNotificationsUI"
