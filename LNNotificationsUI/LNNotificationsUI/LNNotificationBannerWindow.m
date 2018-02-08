@@ -14,6 +14,8 @@
 static const NSTimeInterval LNNotificationAnimationDuration = 0.5;
 static const NSTimeInterval LNNotificationFullDuration = 5.0;
 static const NSTimeInterval LNNotificationCutOffDuration = 2.5;
+static const CGFloat defaultStatusBarSize = 24.0;
+static const CGFloat iphoneXHeightCompensation = 5.0;
 
 static const CGFloat LNNotificationViewHeight = 68.0;
 
@@ -82,6 +84,10 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 	UITapGestureRecognizer* _tgr;
 	
 	NSLayoutConstraint* _topConstraint;
+    
+    CGFloat statusBarDelta;
+    CGFloat statusBarSize;
+    CGFloat notificationHeight;
 	
 	void (^_pendingCompletionHandler)();
 }
@@ -97,6 +103,10 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 	
 	if(self)
 	{
+        statusBarDelta = [UIApplication sharedApplication].statusBarFrame.size.height - defaultStatusBarSize;
+        statusBarSize = statusBarDelta == 0 ? 0 : statusBarDelta + iphoneXHeightCompensation;
+        notificationHeight = LNNotificationViewHeight + statusBarSize;
+        
 		_notificationView = [[LNNotificationBannerView alloc] initWithFrame:self.bounds style:bannerStyle];
 		_notificationView.translatesAutoresizingMaskIntoConstraints = NO;
 		
@@ -110,9 +120,9 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 		_topConstraint = [NSLayoutConstraint constraintWithItem:_notificationView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:vc.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
 		
 		[vc.view addConstraint:_topConstraint];
-		[vc.view addConstraint:[NSLayoutConstraint constraintWithItem:_notificationView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:LNNotificationViewHeight]];
+		[vc.view addConstraint:[NSLayoutConstraint constraintWithItem:_notificationView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:notificationHeight]];
 		
-		_topConstraint.constant = -LNNotificationViewHeight;
+		_topConstraint.constant = -notificationHeight;
 		
 		_swipeView = [UIView new];
 		_swipeView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -127,9 +137,10 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 		_tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_userTappedNotification)];
 		[_tgr requireGestureRecognizerToFail:_sgr];
 		[_swipeView addGestureRecognizer:_tgr];
-		
+
+        NSNumber *swipeViewHeight = [NSNumber numberWithFloat:statusBarSize + 68];
 		[vc.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_swipeView]|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_swipeView)]];
-		[vc.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_swipeView(68)]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_swipeView)]];
+		[vc.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_swipeView(swipeViewHeight)]" options:0 metrics:@{@"swipeViewHeight":swipeViewHeight} views:NSDictionaryOfVariableBindings(_swipeView)]];
 		
 		[self setRootViewController:vc];
 		
@@ -167,7 +178,7 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 	{
 		[_notificationView configureForNotification:notification];
 		
-		_topConstraint.constant = -LNNotificationViewHeight;
+		_topConstraint.constant = -notificationHeight;
 		[self layoutIfNeeded];
 		
 		[UIView animateWithDuration:LNNotificationAnimationDuration delay:delay usingSpringWithDamping:500 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -231,7 +242,7 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 
 - (void)_dismissNotificationViewWithCompletionBlock:(void (^)())completionBlock force:(BOOL)forced
 {
-	if(_notificationViewShown == NO)
+    if(_notificationViewShown == NO)
 	{
 		return;
 	}
@@ -257,7 +268,7 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 	});
 	
 	[UIView animateWithDuration:LNNotificationAnimationDuration delay:delay usingSpringWithDamping:500 initialSpringVelocity:0 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState animations:^{
-		_topConstraint.constant = -LNNotificationViewHeight;
+		_topConstraint.constant = -notificationHeight;
 		[self layoutIfNeeded];
 	} completion:^(BOOL finished) {
 		_lastShowDate = nil;
