@@ -10,6 +10,8 @@
 #import "LNNotification.h"
 
 static const CGFloat LNNotificationRelativeLabelCollapse = 5.0 * 60.0;
+static const CGFloat defaultStatusBarSize = 24.0;
+static const CGFloat iphoneXHeightCompensation = 5.0;
 
 @protocol _LNBackgroundViewCommon <NSObject>
 
@@ -91,7 +93,10 @@ static const CGFloat LNNotificationRelativeLabelCollapse = 5.0 * 60.0;
 	
 	if(self)
 	{
-		self.userInteractionEnabled = NO;
+        CGFloat statusBarDelta = [UIApplication sharedApplication].statusBarFrame.size.height - defaultStatusBarSize;
+        CGFloat statusBarSize = statusBarDelta == 0 ? 0 : statusBarDelta + iphoneXHeightCompensation;
+
+        self.userInteractionEnabled = NO;
 		
 		self.backgroundColor = [UIColor clearColor];
 		
@@ -138,7 +143,8 @@ static const CGFloat LNNotificationRelativeLabelCollapse = 5.0 * 60.0;
 		
 		[_notificationContentView addSubview:_appIcon];
 		
-		[_notificationContentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-7.5-[_appIcon]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_appIcon)]];
+        NSNumber *appIconVpad = [NSNumber numberWithFloat:statusBarSize + 7.5];
+        [_notificationContentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-vpad-[_appIcon]" options:0 metrics:@{@"vpad":appIconVpad} views:NSDictionaryOfVariableBindings(_appIcon)]];
 		
 		_titleLabel = [UILabel new];
 		_titleLabel.font = [UIFont boldSystemFontOfSize:13];
@@ -155,7 +161,7 @@ static const CGFloat LNNotificationRelativeLabelCollapse = 5.0 * 60.0;
 		
 		[_notificationContentView addSubview:_messageLabel];
 		
-		[_notificationContentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-7.5@1000-[_titleLabel]-(-1)-[_messageLabel]->=10-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_titleLabel, _messageLabel)]];
+        [_notificationContentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-vpad@1000-[_titleLabel]-(-1)-[_messageLabel]->=10-|" options:0 metrics:@{@"vpad":appIconVpad} views:NSDictionaryOfVariableBindings(_titleLabel, _messageLabel)]];
 		[_notificationContentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-15-[_appIcon]-11-[_messageLabel]->=15-|" options:0 metrics:nil views:NSDictionaryOfVariableBindings(_appIcon, _messageLabel)]];
 		
 		_dateLabel = [UILabel new];
