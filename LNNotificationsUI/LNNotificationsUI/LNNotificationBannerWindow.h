@@ -13,6 +13,7 @@
 @interface LNNotificationBannerWindow : UIWindow
 
 @property (nonatomic, readonly) BOOL isNotificationViewShown;
+@property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
 
 - (instancetype)initWithFrame:(CGRect)frame style:(LNNotificationBannerStyle)bannerStyle;
 
