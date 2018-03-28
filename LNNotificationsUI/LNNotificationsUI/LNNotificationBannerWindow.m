@@ -54,38 +54,12 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 
 @end
 
-@interface _LNStatusBarStylePreservingViewController : UIViewController
-
-@property (nonatomic, assign) BOOL statusBarStyleHasBeenSet;
-@property (nonatomic, assign) UIStatusBarStyle statusBarStyle;
-
-@end
+@interface _LNStatusBarStylePreservingViewController : UIViewController @end
 @implementation _LNStatusBarStylePreservingViewController
 
 - (void)loadView
 {
 	self.view = [_LNWindowSizedView new];
-}
-
-- (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle
-{
-    _statusBarStyle = statusBarStyle;
-    _statusBarStyleHasBeenSet = YES;
-    [self setNeedsStatusBarAppearanceUpdate];
-}
-
-- (UIStatusBarStyle)preferredStatusBarStyle
-{
-    if (self.statusBarStyleHasBeenSet)
-    {
-        return _statusBarStyle;
-    }
-    return [[UIApplication sharedApplication] statusBarStyle];
-}
-
-- (BOOL)prefersStatusBarHidden
-{
-	return [[UIApplication sharedApplication] isStatusBarHidden];
 }
 
 @end
@@ -164,16 +138,6 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 	}
 	
 	return self;
-}
-
-- (void)setStatusBarStyle:(UIStatusBarStyle)statusBarStyle
-{
-    _statusBarStyle = statusBarStyle;
-    _LNStatusBarStylePreservingViewController *rvc = (_LNStatusBarStylePreservingViewController *)self.rootViewController;
-    if ([rvc isKindOfClass:[_LNStatusBarStylePreservingViewController class]])
-    {
-        rvc.statusBarStyle = statusBarStyle;
-    }
 }
 
 - (BOOL)isNotificationViewShown
