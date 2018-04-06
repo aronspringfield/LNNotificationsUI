@@ -50,6 +50,8 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 	[self.window addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:0 metrics:nil views:@{@"view": self}]];
 	
 	[(LNNotificationBannerWindow*)self.window setIgnoresAddedConstraints:oldVal];
+    self.window.backgroundColor = [UIColor clearColor];
+    self.window.opaque = NO;
 }
 
 @end
@@ -60,6 +62,8 @@ static const CGFloat LNNotificationViewHeight = 68.0;
 - (void)loadView
 {
 	self.view = [_LNWindowSizedView new];
+    self.view.backgroundColor = [UIColor clearColor];
+    self.view.opaque = NO;
 }
 
 @end
